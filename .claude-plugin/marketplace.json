@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bitlocker-dbx-rollback",
+  "description": "Unlock BitLocker again after a Secure Boot dbx change, without the recovery key.",
+  "owner": {
+    "name": "James Phillip Sanders",
+    "email": "hello@jamesphillipsanders.com"
+  },
+  "plugins": [
+    {
+      "name": "bitlocker-dbx-rollback",
+      "description": "A skill that drives dbx-rollback safely: analyze, plan, kit, and the firmware steps one at a time.",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/jpsanders/bitlocker-dbx-rollback"
+    }
+  ]
+}

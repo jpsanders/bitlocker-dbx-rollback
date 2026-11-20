@@ -1,0 +1,16 @@
+---
+name: Feature request
+description: Firmware, a protector type or a source dbx-rollback should support
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you cannot do today, and on which machine.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help

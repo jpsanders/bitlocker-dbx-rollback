@@ -1,0 +1,126 @@
+[build-system]
+requires = ["setuptools>=80", "setuptools_scm[toml]>=9"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bitlocker-dbx-rollback"
+authors = [
+  { name = "James Phillip Sanders", email = "hello@jamesphillipsanders.com" }
+]
+maintainers = [
+  { name = "James Phillip Sanders", email = "hello@jamesphillipsanders.com" }
+]
+description = "Get a BitLocker drive to unlock by itself again after a Secure Boot dbx change, without the recovery key."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.14"
+keywords = ["bitlocker", "tpm", "secure-boot", "dbx", "uefi", "pcr7", "data-recovery", "forensics", "cli", "ai-agents"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Typing :: Typed",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/jpsanders/bitlocker-dbx-rollback"
+Repository = "https://github.com/jpsanders/bitlocker-dbx-rollback"
+Issues = "https://github.com/jpsanders/bitlocker-dbx-rollback/issues"
+Changelog = "https://github.com/jpsanders/bitlocker-dbx-rollback/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+  "bandit[toml]",
+  "black",
+  "build",
+  "darglint",
+  "editorconfig-checker==2.7.2",
+  "flake8",
+  "flake8-pydocstyle",
+  "flake8-tidy-imports",
+  "isort",
+  "mypy>=1.4.1",
+  "pytest",
+  "pytest-cov",
+]
+
+[project.scripts]
+dbx-rollback = "dbx_rollback.cli:main"
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dbx_rollback = ["py.typed", "data/*"]
+
+[tool.mypy]
+strict = true
+check_untyped_defs = true
+explicit_package_bases = true
+mypy_path = "src"
+cache_dir = "build/.mypy_cache"
+
+[[tool.mypy.overrides]]
+module = []
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = ["dbx_rollback"]
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+      venv
+    | \.git
+    | \.env
+    | \.venv
+    | \.tox
+    | env
+    | venv
+    | dist
+    | build
+)/
+'''
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.pydocstyle]
+### Ignoring explanation
+# D1 - Missing docstrings (enforced elsewhere)
+# D202 - No blank lines after function docstring
+# D203 - 1 blank line required before class docstring
+# D205 - 1 blank line required between summary line and description
+# D212 - Multi-line docstring summary should start at the first line
+# D400 - First line should end with a period
+# D406 - Section name should end with newline
+# D407 - Missing dashed underline after section
+# D411 - Missing blank line before section
+# D413 - Missing blank line after last section
+ignore = """
+D1,
+D202,D203,D205,D212,
+D400,D406,D407,D411,D413
+"""
+
+[tool.coverage.run]
+data_file = "build/.coverage"
+
+[tool.pytest.ini_options]
+cache_dir = "build/.pytest_cache"

@@ -1,0 +1,21 @@
+{
+  "name": "bitlocker-dbx-rollback",
+  "description": "A skill that walks an agent through recovering a BitLocker drive after a Secure Boot dbx change, with the stop rules that keep the TPM route and the data safe.",
+  "version": "1.0.0",
+  "author": {
+    "name": "James Phillip Sanders",
+    "email": "hello@jamesphillipsanders.com",
+    "url": "https://jamesphillipsanders.com"
+  },
+  "homepage": "https://github.com/jpsanders/bitlocker-dbx-rollback",
+  "repository": "https://github.com/jpsanders/bitlocker-dbx-rollback",
+  "license": "MIT",
+  "keywords": [
+    "bitlocker",
+    "tpm",
+    "secure-boot",
+    "dbx",
+    "uefi",
+    "data-recovery"
+  ]
+}

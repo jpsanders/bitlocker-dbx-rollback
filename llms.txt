@@ -1,0 +1,7 @@
+# bitlocker-dbx-rollback
+
+> Get a BitLocker drive to unlock by itself again after a Secure Boot dbx change, without the recovery key. CLI: dbx-rollback.
+
+- [README](https://github.com/jpsanders/bitlocker-dbx-rollback/blob/main/README.md): what it fixes and how it works
+- [Manual](https://github.com/jpsanders/bitlocker-dbx-rollback/blob/main/docs/MANUAL.md): every command and the full walkthrough
+- [AGENTS.md](https://github.com/jpsanders/bitlocker-dbx-rollback/blob/main/AGENTS.md): rules for AI agents

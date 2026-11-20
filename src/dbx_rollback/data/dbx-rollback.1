@@ -1,0 +1,58 @@
+.TH DBX-ROLLBACK 1 "" "dbx-rollback" "User Commands"
+.PP
+Get a BitLocker drive to unlock by itself again after a Secure Boot dbx change, without the recovery key.
+.SH SYNOPSIS
+.RS 4
+.nf
+dbx\-rollback analyze \-\-efivars DIR \-\-dislocker\-log FILE [\-\-out FILE]
+dbx\-rollback fetch \-\-out DIR [\-\-lvfs] [\-\-secureboot\-objects] [\-\-windows ROOT] [\-\-catalog KB]
+dbx\-rollback plan \-\-factory\-dbx FILE \-\-target FILE \-\-payloads DIR
+dbx\-rollback psf \-\-cab FILE \-\-psf FILE \-\-out DIR
+dbx\-rollback apply\-delta \-\-msdelta DLL \-\-python EXE [\-\-base FILE] \-\-delta FILE \-\-out FILE
+dbx\-rollback kit [\-\-efivars DIR] \-\-factory\-dbx FILE \-\-target FILE \-\-sequence FILE... \-\-out DIR
+dbx\-rollback guide | man [\-\-install] [\-\-raw]
+.fi
+.RE
+.SH WHEN IT APPLIES
+.PP
+The BitLocker recovery screen says \fBSecure Boot policy has unexpectedly changed\fR, the drive's protectors are TPM and Numerical Password sealed to PCRs 7 and 11, and the firmware's dbx gained entries from outside Windows (an Ubuntu stick's \fBsecureboot\-db.service\fR, \fBfwupd\fR, a BIOS update). PK, KEK and db must still equal the firmware's factory copies, and the firmware must offer a factory key load.
+.SH COMMANDS
+.PP
+**\fBanalyze\fR**
+.PP
+Reads the TPM protector from \fBdislocker\-metadata \-V\fR output, checks its policy is PolicyAuthValue then PolicyPCR(7, 11), replays PCR 7 for every list boundary of today's dbx and every db entry, and writes the dbx that matches.
+.PP
+**\fBfetch\fR**
+.PP
+Downloads signed dbx updates: \fB\-\-lvfs\fR every uefi.org release (needs \fBzstd\fR), \fB\-\-secureboot\-objects\fR every historical file of Microsoft's repository (needs \fBgit\fR), \fB\-\-windows ROOT\fR the files a mounted Windows volume applied. \fB\-\-catalog KB\fR prints Microsoft Update Catalog links.
+.PP
+**\fBplan\fR**
+.PP
+Simulates firmware appends from the factory dbx and searches for the order of updates that rebuilds the target byte for byte. When none does, it names the first list no update produces.
+.PP
+**\fBpsf\fR**
+.PP
+Lists and extracts the dbx files of a Windows update's express package: give the inner \fBWindows10.0\-KB...\-x64.cab\fR (holding \fBexpress.psf.cix.xml\fR) and the \fB.psf\fR. The results are PA30 patches.
+.PP
+**\fBapply\-delta\fR**
+.PP
+Applies a PA30 patch with Microsoft's \fBmsdelta.dll\fR under Wine, through Python's Windows embeddable \fBpython.exe\fR. Patches in \fBn\fR folders apply to nothing (omit \fB\-\-base\fR); patches in \fBf\fR folders apply to the Windows release's base file.
+.PP
+**\fBkit\fR**
+.PP
+Proves by simulation that the sequence rebuilds the target, then writes the kit: the update files in order, the target, the factory dbx, the expected PK, KEK and db, and \fBrebuild.sh\fR.
+.SH THE REBUILD SCRIPT
+.PP
+\fBsudo bash rebuild.sh\fR on the locked machine, from a Linux stick, after the factory keys were loaded. It stops, writing nothing, unless: it runs as root, \fBsecureboot\-db.service\fR is masked or absent, PK, KEK and db equal the sealed state, the firmware is not in Setup Mode, and dbx is the factory list or an earlier step of this rebuild. Each update is written as an authenticated append (attributes 0x67) and dbx must then reach the exact expected size and stay a prefix of the target. It can be rerun after a stop. \fBsudo bash rebuild.sh verify\fR writes nothing and confirms dbx equals the target and Secure Boot is on. Every run appends to \fBrebuild.log\fR beside the script.
+.SH WALKTHROUGH
+.PP
+1. Boot the locked PC from a Linux stick. Mask the stick's dbx updater first: \fBsudo systemctl mask \-\-now secureboot\-db.service\fR. 2. Save \fBsudo dislocker\-metadata \-V <BitLocker partition>\fR to a file, and copy the efivarfs files SecureBoot, SetupMode, PK, KEK, db, dbx and dbxDefault. Copy the TPM event log too (\fB/sys/kernel/security/tpm0/binary_bios_measurements\fR) to check the PCR 7 model. 3. \fBanalyze\fR. It must report one MATCH. If none matches, PK, KEK, db or the boot path changed as well, and this tool cannot help. 4. \fBtail \-c +5 efivars/dbxDefault\-*\fR is the factory dbx; the target must start with it. 5. \fBfetch\fR updates, then \fBplan\fR. If a list is missing, find the update Windows applied at that time: a Windows volume you own (\fBfetch \-\-windows\fR), or a Windows update from the catalog (\fBfetch \-\-catalog\fR, then \fBcabextract\fR, \fBpsf\fR and \fBapply\-delta\fR). Rerun \fBplan\fR until it rebuilds exactly. 6. \fBkit\fR, and copy the kit to the stick. 7. In the firmware: Secure Boot off, save. Clear the Secure Boot keys, save. Load the factory keys, save. Secure Boot on, save. Do one change per restart. Never clear the TPM or reset security settings. 8. Boot the stick, \fBsudo bash rebuild.sh\fR. On SUCCESS reboot into the stick and run \fBverify\fR. 9. On VERIFIED, unplug the stick, start Windows, and save the recovery key with \fBmanage\-bde \-protectors \-get C:\fR.
+.SH SAFETY
+.PP
+Nothing writes to the encrypted drive or the TPM. The recovery key keeps working whatever happens. The one step that can end the no key route is clearing the Secure Boot keys on firmware that then cannot load its factory keys.
+.SH FILES
+.PP
+No Microsoft binary is part of this project. Updates are downloaded from LVFS, \fBmicrosoft/secureboot_objects\fR and the Microsoft Update Catalog; \fBmsdelta.dll\fR must come from a Windows installation you own.
+.SH SEE ALSO
+.PP
+\fBdislocker\-metadata\fR(1), \fBefi\-updatevar\fR(1), \fBsbkeysync\fR(1), \fBmanage\-bde\fR on Windows.
