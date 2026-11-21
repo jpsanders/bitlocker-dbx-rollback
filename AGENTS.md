@@ -20,3 +20,9 @@ Guidance for AI agents working in or with this repository.
 - `docs/MANUAL.md` is the one source of the manual; run `python scripts/build_man.py` after editing it.
 - Tests use synthetic data only. Never add a Microsoft binary, a real firmware dump or a real BitLocker metadata
   file to the repository.
+
+## ruru
+
+`make ruru` (part of `make checks` and CI) reviews your branch against main with
+[ruru](https://github.com/jpsanders/ruru-review): a tamper audit of the tests, fail first for new tests, and mutants
+on the changed lines. Write a test for each survivor; never weaken, skip or delete a test to make it pass.
